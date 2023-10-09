@@ -13,39 +13,25 @@ const EventList = () => {
   const { data, error } = useData();
   const [type, setType] = useState();
   const [currentPage, setCurrentPage] = useState(1);
-console.log("type", type)
-  // const filteredEvents = (
-  //   (!type
-  //     ? data?.events
-  //     : data?.events) || []
-  // ).filter((event, index) => {
-  //   if (
-  //     (currentPage - 1) * PER_PAGE <= index &&
-  //     PER_PAGE * currentPage > index
-  //   ) {
-  //     return true;
-  //   }
-  //   return false;
-  // });
-
-  const filteredEvents = (
-    data?.events || []
-    ).filter((event, index) => {
-    const eventMatchesType = !type || event.type === type; 
-    console.log("yo",eventMatchesType)
-    // vérif de si l'événement correspond au type sélectionné
-    const eventIsInCurrentPage = index >= (currentPage - 1) * PER_PAGE && index < currentPage * PER_PAGE; 
-    // vérif de si l'événement est sur la page actuelle
-  
-    return eventMatchesType && eventIsInCurrentPage;
+  const filteredEvents = (data?.events || []).filter((event) => {
+    const eventMatchesType = !type || event.type === type;
+    return eventMatchesType;
   });
-console.log(filteredEvents)
+  // events filtrés en fonction du type sélectionné si type est null || non défini 
+  // tous les événements sont considérés comme correspondants
+  const paginatedEvents = filteredEvents.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE
+  );
+  // events filtrés ensuite paginés en 
+  // utilisant slice pour extraire les events de la page actuelle en fonction du nombre d'events par page 
   const changeType = (evtType) => {
     setCurrentPage(1);
     setType(evtType);
-    console.log("evt type",evtType)
   };
-  const pageNumber = Math.floor((filteredEvents?.length || 0) / PER_PAGE) + 1;
+  const pageNumber = Math.max(Math.ceil(filteredEvents.length / PER_PAGE), 1);
+  // divise nb total d'events filtrés par le 
+  // nombre d'events par page donnant ainsi le nombre total de pages nécessaires pour afficher tous les événements filtrés
   const typeList = new Set(data?.events.map((event) => event.type));
   return (
     <>
@@ -63,7 +49,7 @@ console.log(filteredEvents)
       )}
           />
           <div id="events" className="ListContainer">
-            {filteredEvents.map((event) => (
+            {paginatedEvents.map((event) => (
               <Modal key={event.id} Content={<ModalEvent event={event} />}>
                 {({ setIsOpened }) => (
                   <EventCard
