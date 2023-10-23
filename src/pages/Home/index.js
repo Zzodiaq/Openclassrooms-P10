@@ -13,23 +13,9 @@ import Modal from "../../containers/Modal";
 import { useData } from "../../contexts/DataContext";
 
 const Page = () => {
-  const dataContext = useData();
-  
-  // Vérifier si 'data' existe avant d'accéder à ses propriétés
-  if (!dataContext.data) {
-    // Si 'data' n'est pas encore chargé, vous pouvez afficher un message de chargement ou autre chose
-    return <div>Chargement en cours...</div>;
-  }
-
-const evt = useData().data.events;
 
 
-const last = evt.reduce((evenementLePlusRecent, evenementActuel) => {
-  const dateLePlusRecente = new Date(evenementLePlusRecent.date);
-  const dateActuelle = new Date(evenementActuel.date);
-
-  return dateActuelle > dateLePlusRecente ? evenementActuel : evenementLePlusRecent;
-}, evt[0]); 
+const  { last }   = useData();
 
   return <>
     <header>
@@ -133,13 +119,15 @@ const last = evt.reduce((evenementLePlusRecent, evenementActuel) => {
     <footer className="row">
       <div className="col presta">
         <h3>Notre derniére prestation</h3>
-        <EventCard
+        {last && (
+          <EventCard
           imageSrc={last.cover}
-          title={last.title}
+          title={last.title} 
           date={new Date(last.date)}
           small
           label="boom"
-        />
+          />
+        )}
       </div>
       <div className="col contact">
         <h3>Contactez-nous</h3>
